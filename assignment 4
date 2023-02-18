@@ -1,0 +1,270 @@
+create table Employee(
+    emp_num int PRIMARY KEY,
+    emp_name VARCHAR(20),
+    department_id VARCHAR(20),
+    salary double,
+    joining_year date,
+    email VARCHAR(50),
+    FOREIGN KEY(department_id) references department(department_id)
+);
+
+create table department(
+    department_id VARCHAR(20) PRIMARY KEY,
+    department_name VARCHAR(20)
+);
+
+create table increments(
+    emp_num int PRIMARY KEY,
+    emp_name VARCHAR(20),
+    salary_increment double, 
+    FOREIGN KEY(emp_num) references employee(emp_num)
+);
+
+create table teacher(
+    teacher_id int PRIMARY KEY,
+    teacher_name VARCHAR(20)
+);
+
+create table students(
+    student_id int primary key,
+    teacher_id int,
+    FOREIGN KEY(teacher_id) references teacher(teacher_id)
+);
+drop table students;
+select * from students; 
+
+insert into department values('MA201','Mathematics');
+insert into department values('PH201','Physics');
+insert into department values('CS204','Computer-Science');
+insert into department values('CH201','Chemistry');
+insert into department values('EC201','Electronics');
+insert into department values('EE201','Electrical');
+
+insert into employee values(1,'Dhiru Singh','CH201',750000,'2013-02-08','ds@gmail.com');
+insert into employee values(2,'Amit Shah','CS204',2000000,'2013-08-15','as@hotmail.com');
+insert into employee values(3,'LK Advani','PH201',700000,'2015-07-23','adl@rediffmail.com');
+insert into employee values(4,'Vansh Tandon','EE201',600000,'2018-06-12','vt@gmail.com');
+insert into employee values(5,'Shivankit Parihar','MA201',800000,'2013-04-12','sp@gmail.com');
+insert into employee values(6,'Naveen Kasturia','EC201',1300000,'2020-05-05','nk@gmail.com');
+insert into employee values(7,'Subrata Kumar','EC201',3500000,'2017-06-23','sk@gmail.com');
+insert into employee values(8,'Arunabha Bagchi','PH201',1000000,'2017-06-23','ab@gmail.com');
+insert into employee values(9,'Arunabha Bagchi','PH201',1000000,'2017-06-23','ab@gmail.com');
+insert into employee values(10,'Subrata Kumar','EC201',3500000,'2017-06-23','sk@gmail.com');
+update employee set email="ab@gmail.com" where emp_num=8;
+insert into increments values(1,'Dhiru Singh',3050.5);
+insert into increments values(2,'Amit Shah',20550);
+insert into increments values(3,'LK Advani',15600);
+insert into increments values(4,'Vansh Tandon',10050);
+insert into increments values(5,'Shivankit Parihar',1250.5);
+insert into increments values(6,'Naveen Kasturia',5400.5);
+insert into increments values(7,'Subrata Kumar',5400.5);
+insert into increments values(8,'Arunabha Bagchi',15600);
+
+insert into teacher values(201314001,'Viren Oberoi');
+insert into teacher values(201314002,'Ajay Nath');
+insert into teacher values(201314003,'Pravesh Bhadviya');
+insert into teacher values(201314004,'Kamal Jha');
+insert into teacher values(201314005,'Tirth Joshi');
+insert into teacher values(201314006,'Mohak Mangal');
+insert into teacher values(201314007,'Sharmistha Sarkar');
+
+insert into students values(202151001,201314001);
+insert into students values(202151002,201314002);
+insert into students values(202151003,201314003);
+insert into students values(202151004,201314004);
+insert into students values(202151005,201314005);
+insert into students values(202151006,201314006);
+insert into students(student_id) values(201314007);
+--second highest salary of employee Question 1 
+SELECT MAX(salary)
+FROM employee 
+WHERE salary<(SELECT MAX(salary) FROM employee);
+
+--Fetch the monthly Salary of the Employee if the annual salary is given? Question 3
+SELECT emp_name,ROUND(salary/12,2)
+from employee;
+
+--Fetch the first record from the Employee table? Question 4
+SELECT *
+FROM employee 
+LIMIT 1;
+
+--Fetch the last record from the Department table? Question 5
+SELECT *
+FROM department 
+ORDER BY department_id DESC
+LIMIT 1;
+
+--Display the first 5 Records from the Employee table? Question 6
+SELECT *
+FROM employee
+LIMIT 5;
+
+--Get 3 Highest salaries records from the Employee table? Question 7
+SELECT *
+FROM employee 
+ORDER BY salary desc 
+LIMIT 3;
+
+--Create a table with the same structure as the Employee table? Question 8
+create table clone as select * from employee;
+select * from clone;
+
+--Display the first 50% of records from the Employee table? Question 9
+SELECT *
+FROM employee
+WHERE emp_num <= (SELECT CEILING(COUNT(*) * 0.5) FROM employee);
+
+SELECT *
+FROM FIRST_HALF;
+
+--Fetch only common records between tables Teachers and Students. Question 10 
+SELECT teacher_id
+FROM teacher
+where teacher_id in (SELECT teacher_id from students);
+
+
+--Get information about Employees where an Employee is not assigned to the department. Question 11
+SELECT *
+FROM employee 
+where department_id is null;
+
+--Get distinct records from the Increment table without using distinct keyword.  Question 12
+SELECT A.salary_increment
+from increments A
+where A.salary_increment not in (SELECT salary_increment from increments B where A.emp_num<>B.emp_num);
+
+
+
+--Select all records from the Employee table whose name is 'XYZ and 'PQR'. Question 13
+SELECT *
+from employee 
+where emp_num LIKE 'XYZ' or emp_num LIKE 'PQR';
+
+--Select all records from the Employee table where the name is not in 'XYZ and 'PQR'. Question 14
+SELECT *
+from employee 
+where emp_num NOT LIKE 'XYZ' AND emp_num NOT LIKE 'PQR';
+ 
+--Write SQL query for the below scenario I/p: ABCDE  Question : 15
+SET @input = 'ABCDE';
+
+SELECT SUBSTRING(@input, idx, 1) AS letter
+FROM (
+  SELECT @idx := @idx + 1 AS idx
+  FROM (
+    SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+  ) dummy1, (SELECT @idx := 0) dummy2
+) derived
+WHERE idx <= LENGTH(@input);
+
+--Fetch all the records from employees whose joining year is 2017? Question 16
+SELECT *
+from employee
+where joining_year LIKE '2017%';
+
+--Find the maximum salary offered by each department? Question 17 
+SELECT MAX(salary),department_name 
+FROM employee 
+JOIN department 
+ON employee.department_id=department.department_id 
+GROUP BY department_name;
+
+--Display the name of employees who joined in 2016 and whose salary is greater than 10000? Question 18
+SELECT emp_name 
+FROM employee 
+WHERE joining_year LIKE '2016%' AND salary>10000;
+
+--Question 19 
+SET @count = 3;
+
+SELECT REPEAT('*', idx) AS pattern
+FROM (
+  SELECT @idx := @idx + 1 AS idx
+  FROM (
+    SELECT 0 UNION ALL SELECT 1 UNION ALL SELECT 2
+  ) dummy1, (SELECT @idx := 0) dummy2
+) derived
+WHERE idx <= @count;
+
+--Add the email validation using only one query in the employee table? Question 20
+UPDATE employee
+SET email = NULL
+WHERE email IS NOT NULL AND NOT (email RLIKE '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+
+--Display numbers from 1 to 100 Question 21
+WITH RECURSIVE cte (Number) AS (
+    SELECT 1            
+    UNION ALL
+    SELECT Number + 1   
+    FROM cte
+    WHERE Number < 100
+)
+SELECT Number
+FROM cte
+ORDER BY Number;
+
+--Count number of duplicate rows from table employee Question 22
+select count(emp_num) 
+from employee A
+where emp_num in (SELECt A.emp_num from employee B where A.emp_name=B.emp_name and A.department_id=B.department_id and A.salary=B.salary and A.email like B.email and A.joining_year like B.joining_year and A.emp_num<>B.emp_num);
+
+-- Remove duplicate rows from the table Question 23
+DELETE t1
+FROM employee t1
+JOIN (SELECT MIN(emp_num) as id,emp_name,department_id,salary,email,joining_year
+      FROM employee
+      GROUP BY emp_name,department_id,salary,email,joining_year) t2
+ON t1.emp_num>t2.id AND t1.emp_name = t2.emp_name AND t1.department_id = t2.department_id AND t1.salary=t2.salary AND t1.joining_year=t2.joining_year AND t1.email=t2.email;
+
+select * from employee;
+
+--Question 24
+select * 
+from students
+inner join teacher 
+on students.teacher_id=teacher.teacher_id;
+
+select * 
+from students
+left outer join teacher 
+on students.teacher_id=teacher.teacher_id;
+
+select * 
+from students
+right join teacher 
+on students.teacher_id=teacher.teacher_id;
+
+select * 
+from students
+left outer join teacher 
+on students.teacher_id=teacher.teacher_id
+union
+select * 
+from students
+right join teacher 
+on students.teacher_id=teacher.teacher_id;
+
+--Display the allocated departments with their its department id? Question 25 
+SELECT department_id,department_name
+FROM department; 
+
+--Query to fetch employees associated with department names? Question 26 
+SELECT emp_name,department_name 
+FROM employee 
+join department 
+ON employee.department_id=department.department_id;
+
+--Query to fetch all departments with its associated employees? Question 27
+SELECT department_name as department, emp_name as employee
+from department 
+join employee 
+on department.department_id=employee.department_id;
+
+--Joins between Employee, Department, and Increment Tables. Question 28 
+SELECT * 
+from employee 
+join department 
+on department.department_id=employee.department_id 
+join increments 
+on increments.emp_num=employee.emp_num;
